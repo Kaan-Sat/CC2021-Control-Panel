@@ -24,6 +24,7 @@ import QtQuick 2.12
 import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Controls.Universal 2.12
 
 import Qt.labs.settings 1.0
 
@@ -39,8 +40,6 @@ ApplicationWindow {
     // Global properties
     //
     readonly property int spacing: 8
-    readonly property color foregroundColor: "#ffffff"
-    readonly property color windowBackgroundColor: "#121920"
     readonly property string monoFont: {
         switch (Qt.platform.os) {
         case "osx":
@@ -88,17 +87,15 @@ ApplicationWindow {
     // Window geometry
     //
     visible: false
-    minimumWidth: 800
-    minimumHeight: 600
+    minimumWidth: 600
+    minimumHeight: 480
     title: Cpp_AppName + " v" + Cpp_AppVersion
 
     //
     // Theme options
     //
-    palette.text: app.foregroundColor
-    palette.buttonText: app.foregroundColor
-    palette.windowText: app.foregroundColor
-    palette.window: app.windowBackgroundColor
+    Universal.theme: Universal.Dark
+    Universal.accent: Universal.Amber
 
     //
     // Load window position from settings & show window

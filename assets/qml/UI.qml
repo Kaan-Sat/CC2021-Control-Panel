@@ -24,143 +24,267 @@ import QtQuick 2.12
 import QtQuick.Dialogs 1.1
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
+import QtQuick.Controls.Universal 2.12
 
 Page {
     id: root
 
     //
-    // Toolbar with buttons
+    // Background
     //
-    header: ToolBar {
-        height: 48
+    background: Image {
+        opacity: 0.72
+        fillMode: Image.PreserveAspectCrop
+        source: "qrc:/images/background.jpg"
+    }
 
-        //
-        // Background gradient
-        //
-        Rectangle {
-            border.width: 1
-            border.color: palette.midlight
+    //
+    // Toolbar
+    //
+    RowLayout {
+        id: toolbar
 
-            gradient: Gradient {
-                GradientStop { position: 0; color: "#21373f" }
-                GradientStop { position: 1; color: "#11272f" }
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            margins: app.spacing
+        }
+
+        ColumnLayout {
+            spacing: app.spacing
+            Layout.alignment: Qt.AlignVCenter
+
+            Image {
+                opacity: 0.8
+                sourceSize.width: 240
+                source: "qrc:/images/kaansat.svg"
+                Layout.alignment: Qt.AlignVCenter
             }
 
-            anchors {
-                fill: parent
-                topMargin: -border.width
-                leftMargin: -border.width * 10
-                rightMargin: -border.width * 10
+            Label {
+                opacity: 0.6
+                font.pixelSize: 10
+                text: Cpp_AppName + " v" + Cpp_AppVersion
             }
         }
 
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Label {
+            Layout.alignment: Qt.AlignVCenter
+            text: qsTr("Serial Studio Connection")
+        }
+
+        Switch {
+            Layout.alignment: Qt.AlignVCenter
+            Universal.accent: Universal.Green
+        }
+    }
+
+    //
+    // User interface
+    //
+    RowLayout {
+        anchors.fill: parent
+        spacing: app.spacing
+        anchors.margins: app.spacing
+        anchors.topMargin: 2 * app.spacing + toolbar.height
+
         //
-        // Toolbar controls
+        // Buttons
         //
-        RowLayout {
-            spacing: app.spacing
-            anchors.fill: parent
-            anchors.margins: app.spacing
+        GridLayout {
+            id: grid
+            columns: 2
+            rowSpacing: app.spacing
+            columnSpacing: app.spacing
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumWidth: app.width * 3/5
+            Layout.maximumWidth: app.width * 3/5
+
+            property real columnHeight: 72
+            property real columnWidth: app.width * 3/10 - grid.columnSpacing
 
             Button {
-                flat: true
-                icon.width: 24
-                icon.height: 24
-                Layout.fillHeight: true
-                icon.color: palette.text
-                icon.source: "qrc:/icons/update.svg"
-                text: qsTr("Check for updates")
-                onClicked: {
-                    Cpp_Updater.setNotifyOnFinish(Cpp_AppUpdaterUrl, true)
-                    Cpp_Updater.checkForUpdates(Cpp_AppUpdaterUrl)
-                }
+                id: simModeEnabled
+
+
+                checkable: true
+                text: qsTr("Simulation mode")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/simulation.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
             }
 
             Button {
-                flat: true
-                icon.width: 24
-                icon.height: 24
-                Layout.fillHeight: true
-                icon.color: palette.text
-                icon.source: "qrc:/icons/bug.svg"
-                text: qsTr("Application log")
-                onClicked: Cpp_Misc_Utilities.openLogFile()
+                id: activateSimMode
+
+                checkable: true
+                enabled: simModeEnabled.checked
+                text: qsTr("Activate simulation mode")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/start.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: telemetryEnabled
+
+                checkable: true
+                text: qsTr("Container telemetry")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/telemetry-on.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: payloadTelemetry
+
+                checkable: true
+                text: qsTr("Payload telemetry")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/radar.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: releasePayload1
+                text: qsTr("Release payload 1")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/filter-1.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: releasePayload2
+                text: qsTr("Release payload 2")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/filter-2.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: updateTime
+                text: qsTr("Update container time")
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: "qrc:/icons/time.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
             }
 
             Item {
                 Layout.fillWidth: true
             }
 
+            Item {
+                Layout.fillHeight: true
+            }
+
+            Item {
+                Layout.fillHeight: true
+            }
+
+            Button {
+                text: qsTr("Open simulation CSV")
+
+                icon.width: 24
+                icon.height: 24
+                icon.source: "qrc:/icons/cog.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight / 2
+                Layout.maximumHeight: grid.columnHeight / 2
+            }
+
             Label {
-                Layout.alignment: Qt.AlignVCenter
-                text: qsTr("Language") + ":"
+                verticalAlignment: Label.AlignVCenter
+                horizontalAlignment: Label.AlignHCenter
+                text: "<" + qsTr("No CSV file selected") + ">"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight / 2
+                Layout.maximumHeight: grid.columnHeight / 2
+            }
+        }
+
+        //
+        // Console display
+        //
+        TextArea {
+            opacity: 0.8
+            readOnly: true
+            color: "#72d5a3"
+            font.pixelSize: 12
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            font.family: app.monoFont
+            textFormat: Text.PlainText
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            placeholderText: qsTr("No data received so far") + "..."
+
+            background: Rectangle {
+                color: "#000000"
+                border.width: 2
+                border.color: "#bebebe"
             }
 
-            ComboBox {
-                Layout.alignment: Qt.AlignVCenter
-                model: Cpp_Misc_Translator.availableLanguages
-                onCurrentIndexChanged: Cpp_Misc_Translator.setLanguage(currentIndex)
+            MouseArea {
+                anchors.fill: parent
             }
-        }
-    }
-
-    //
-    // Background color
-    //
-    background: Rectangle {
-        color: app.windowBackgroundColor
-    }
-
-    //
-    // Image, labels & buttons
-    //
-    ColumnLayout {
-        spacing: app.spacing
-        anchors.centerIn: parent
-
-        Image {
-            source: Cpp_AppIcon
-            sourceSize: Qt.size(256, 188)
-            Layout.alignment: Qt.AlignHCenter
-        }
-
-        Item {
-            Layout.minimumHeight: app.spacing
-        }
-
-        Label {
-            font.bold: true
-            font.pixelSize: 24
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Hello World")
-        }
-
-        Label {
-            font.pixelSize: 18
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Click on any button")
-        }
-
-        Item {
-            Layout.minimumHeight: app.spacing
-        }
-
-        Button {
-            icon.color: palette.text
-            Layout.minimumWidth: 156
-            Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/icons/close.svg"
-            text: qsTr("Close")
-            onClicked: app.close()
-        }
-
-        Button {
-            icon.color: palette.text
-            Layout.minimumWidth: 156
-            Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/icons/website.svg"
-            text: qsTr("Visit website")
-            onClicked: Qt.openUrlExternally(Cpp_AppOrganizationDomain)
         }
     }
 }

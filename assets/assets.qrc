@@ -13,5 +13,21 @@
         <file>icons/website.svg</file>
         <file>icons/bug.svg</file>
         <file>images/icon.svg</file>
+        <file>images/background.jpg</file>
+        <file>images/kaansat.svg</file>
+        <file>icons/build.svg</file>
+        <file>icons/cog.svg</file>
+        <file>icons/construction.svg</file>
+        <file>icons/filter-1.svg</file>
+        <file>icons/filter-2.svg</file>
+        <file>icons/lock-open.svg</file>
+        <file>icons/memory.svg</file>
+        <file>icons/radar.svg</file>
+        <file>icons/simulation.svg</file>
+        <file>icons/start.svg</file>
+        <file>icons/table.svg</file>
+        <file>icons/telemetry-off.svg</file>
+        <file>icons/telemetry-on.svg</file>
+        <file>icons/time.svg</file>
     </qresource>
 </RCC>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Alex Spataru <https://github.com/alex-spataru>
+ * Copyright (c) 2021 Alex Spataru <https://github.com/alex-spataru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,53 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef MISC_TRANSLATOR_H
-#define MISC_TRANSLATOR_H
-
-#include <QLocale>
-#include <QObject>
-#include <QTranslator>
-
-#ifdef QT_QML_LIB
-#    include <QtQml>
-#endif
-
-namespace Misc
-{
-class Translator : public QObject
-{
-    // clang-format off
-    Q_OBJECT
-    Q_PROPERTY(int language
-               READ language
-               WRITE setLanguage
-               NOTIFY languageChanged)
-    Q_PROPERTY(QStringList availableLanguages
-               READ availableLanguages
-               CONSTANT)
-    // clang-format on
-
-signals:
-    void languageChanged();
-
-private:
-    Translator();
-
-public:
-    static Translator *getInstance();
-
-    int language() const;
-    int systemLanguage() const;
-    QStringList availableLanguages() const;
-
-public slots:
-    void setLanguage(const int language);
-    void setLanguage(const QLocale &locale, const QString &language);
-
-private:
-    int m_language;
-    QTranslator m_translator;
-};
-}
+#ifndef SERIALSTUDIO_COMMUNICATOR_H
+#define SERIALSTUDIO_COMMUNICATOR_H
 
 #endif

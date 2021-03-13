@@ -35,7 +35,6 @@
 
 #include <AppInfo.h>
 #include <Misc/Utilities.h>
-#include <Misc/Translator.h>
 
 #ifdef Q_OS_WIN
 #    include <windows.h>
@@ -74,7 +73,6 @@ int main(int argc, char **argv)
     app.setApplicationVersion(APP_VERSION);
     app.setOrganizationName(APP_DEVELOPER);
     app.setOrganizationDomain(APP_SUPPORT_URL);
-    app.setStyle(QStyleFactory::create("Fusion"));
 
     // Configure CuteLogger
     auto fileAppender = new FileAppender;
@@ -94,24 +92,15 @@ int main(int argc, char **argv)
     QQmlApplicationEngine engine;
     auto updater = QSimpleUpdater::getInstance();
     auto utilities = Misc::Utilities::getInstance();
-    auto translator = Misc::Translator::getInstance();
-
-    // Configure dark UI
-    Misc::Utilities::configureDarkUi();
-
-    // Automatically re-translate UI
-    QObject::connect(translator, &Misc::Translator::languageChanged, &engine,
-                     &QQmlApplicationEngine::retranslate);
 
     // Log status
     LOG_INFO() << "Finished creating application modules";
 
     // Init QML interface
     auto c = engine.rootContext();
-    QQuickStyle::setStyle("Fusion");
+    QQuickStyle::setStyle("Universal");
     c->setContextProperty("Cpp_Updater", updater);
     c->setContextProperty("Cpp_Misc_Utilities", utilities);
-    c->setContextProperty("Cpp_Misc_Translator", translator);
     c->setContextProperty("Cpp_AppIcon", "qrc" APP_ICON);
     c->setContextProperty("Cpp_AppName", app.applicationName());
     c->setContextProperty("Cpp_AppUpdaterUrl", APP_UPDATER_URL);

@@ -14,7 +14,7 @@ CONFIG += c++11
 #-------------------------------------------------------------------------------
 
 TEMPLATE = app
-TARGET = QtApp
+TARGET = cc2021
 
 CONFIG += qtc_runnable
 CONFIG += resources_big
@@ -66,8 +66,6 @@ macx* {
 }
 
 linux:!android {
-    TARGET = qt-app
-
     target.path = /usr/bin
     icon.path = /usr/share/pixmaps
     desktop.path = /usr/share/applications
@@ -89,17 +87,12 @@ RESOURCES += \
 DISTFILES += \
     assets/qml/*.qml
 
-TRANSLATIONS += \
-    assets/translations/en.ts \
-    assets/translations/es.ts \
-    assets/translations/zh.ts
-
 HEADERS += \
     src/AppInfo.h \
     src/Misc/Utilities.h \
-    src/Misc/Translator.h
+    src/SerialStudio/Communicator.h
 
 SOURCES += \
     src/Misc/Utilities.cpp \
-    src/Misc/Translator.cpp \
+    src/SerialStudio/Communicator.cpp \
     src/main.cpp

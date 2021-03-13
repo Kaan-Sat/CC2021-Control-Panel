@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=CC2021 Control Panel
+Comment=CanSat Competition 2021 Control Panel
+Exec=cc2021
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Development;Qt;
+Icon=cc2021
