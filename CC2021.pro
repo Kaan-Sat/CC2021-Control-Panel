@@ -69,7 +69,7 @@ linux:!android {
     target.path = /usr/bin
     icon.path = /usr/share/pixmaps
     desktop.path = /usr/share/applications
-    icon.files += deploy/linux/*.png
+    icon.files += deploy/linux/*.svg
     desktop.files += deploy/linux/*.desktop
 
     INSTALLS += target desktop icon

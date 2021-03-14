@@ -332,13 +332,13 @@ bool Communicator::sendData(const QString &data)
 {
     if (m_socket.isWritable() && m_socket.isOpen() && !data.isEmpty())
     {
-        auto bytes = QString(data + "\n").toUtf8();
+        auto bytes = data.toUtf8();
         auto wleng = m_socket.write(bytes);
 
         auto sentData = bytes;
         sentData.chop(bytes.length() - wleng);
 
-        emit rx("TX: " + QString::fromUtf8(sentData));
+        emit rx("TX: " + QString::fromUtf8(sentData) + "\n");
         return sentData.length() == bytes.length();
     }
 

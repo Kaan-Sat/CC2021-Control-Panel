@@ -357,33 +357,43 @@ Page {
                 }
             }
 
-            TextArea {
-                id: textArea
-                readOnly: true
-                color: "#72d5a3"
-                font.pixelSize: 12
+            ScrollView {
+                id: scrollView
+                clip: true
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                font.family: app.monoFont
-                textFormat: Text.PlainText
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                placeholderText: qsTr("No data received so far") + "..."
+                contentWidth: parent.width
+                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
 
-                Connections {
-                    target: Cpp_SerialStudio_Communicator
-                    function onRx(data) {
-                        textArea.text += data
+                TextArea {
+                    id: textArea
+                    readOnly: true
+                    color: "#72d5a3"
+                    font.pixelSize: 12
+
+                    font.family: app.monoFont
+                    textFormat: Text.PlainText
+                    width: scrollView.contentWidth
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    placeholderText: qsTr("No data received so far") + "..."
+
+                    Connections {
+                        target: Cpp_SerialStudio_Communicator
+                        function onRx(data) {
+                            textArea.text += data
+                        }
                     }
-                }
 
-                background: Rectangle {
-                    border.width: 1
-                    color: "#aa000000"
-                    border.color: "#bebebe"
-                }
+                    background: Rectangle {
+                        border.width: 1
+                        color: "#aa000000"
+                        border.color: "#bebebe"
+                    }
 
-                MouseArea {
-                    anchors.fill: parent
+                    onTextChanged: {
+                        if (scrollView.contentHeight > scrollView.height)
+                            textArea.cursorPosition = textArea.length - 1
+                    }
                 }
             }
         }
