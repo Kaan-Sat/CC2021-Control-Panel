@@ -52,6 +52,7 @@ Communicator::Communicator()
     m_containerTelemetryEnabled = true;
 
     // Connect socket signals/slots
+    connect(&m_socket, &QTcpSocket::disconnected, &m_socket, &QTcpSocket::close);
     connect(&m_socket, &QTcpSocket::connected, this, &Communicator::connectedChanged);
     connect(&m_socket, &QTcpSocket::disconnected, this, &Communicator::connectedChanged);
 
@@ -72,7 +73,7 @@ Communicator *Communicator::getInstance()
 
 bool Communicator::connectedToSerialStudio() const
 {
-    return m_socket.isOpen() && m_socket.isWritable();
+    return m_socket.state() == QTcpSocket::ConnectedState;
 }
 
 bool Communicator::simulationEnabled() const
@@ -163,8 +164,11 @@ void Communicator::openCsv()
 
 void Communicator::tryConnection()
 {
-    if (!m_socket.isOpen())
+    if (!connectedToSerialStudio())
+    {
+        m_socket.abort();
         m_socket.connectToHost(QHostAddress::LocalHost, SERIAL_STUDIO_PLUGINS_PORT);
+    }
 }
 
 void Communicator::releasePayload1()
