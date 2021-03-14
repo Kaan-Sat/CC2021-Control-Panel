@@ -90,9 +90,11 @@ DISTFILES += \
 HEADERS += \
     src/AppInfo.h \
     src/Misc/Utilities.h \
+    src/Misc/TimerEvents.h \
     src/SerialStudio/Communicator.h
 
 SOURCES += \
+    src/main.cpp \
     src/Misc/Utilities.cpp \
-    src/SerialStudio/Communicator.cpp \
-    src/main.cpp
+    src/Misc/TimerEvents.cpp \
+    src/SerialStudio/Communicator.cpp

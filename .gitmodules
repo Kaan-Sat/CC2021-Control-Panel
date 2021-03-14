@@ -4,3 +4,6 @@
 [submodule "libs/CuteLogger"]
 	path = libs/CuteLogger
 	url = https://github.com/alex-spataru/CuteLogger
+[submodule "libs/qtcsv"]
+	path = libs/qtcsv
+	url = https://github.com/iamantony/qtcsv

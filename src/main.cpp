@@ -35,6 +35,8 @@
 
 #include <AppInfo.h>
 #include <Misc/Utilities.h>
+#include <Misc/TimerEvents.h>
+#include <SerialStudio/Communicator.h>
 
 #ifdef Q_OS_WIN
 #    include <windows.h>
@@ -92,6 +94,8 @@ int main(int argc, char **argv)
     QQmlApplicationEngine engine;
     auto updater = QSimpleUpdater::getInstance();
     auto utilities = Misc::Utilities::getInstance();
+    auto timerEvents = Misc::TimerEvents::getInstance();
+    auto ssCommunicator = SerialStudio::Communicator::getInstance();
 
     // Log status
     LOG_INFO() << "Finished creating application modules";
@@ -104,8 +108,10 @@ int main(int argc, char **argv)
     c->setContextProperty("Cpp_AppIcon", "qrc" APP_ICON);
     c->setContextProperty("Cpp_AppName", app.applicationName());
     c->setContextProperty("Cpp_AppUpdaterUrl", APP_UPDATER_URL);
+    c->setContextProperty("Cpp_Misc_TimerEvents", timerEvents);
     c->setContextProperty("Cpp_AppVersion", app.applicationVersion());
     c->setContextProperty("Cpp_AppOrganization", app.organizationName());
+    c->setContextProperty("Cpp_SerialStudio_Communicator", ssCommunicator);
     c->setContextProperty("Cpp_AppOrganizationDomain", app.organizationDomain());
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
@@ -118,6 +124,9 @@ int main(int argc, char **argv)
         LOG_WARNING() << "QML engine error";
         return EXIT_FAILURE;
     }
+
+    // Start timer subsystem
+    Misc::TimerEvents::getInstance()->startTimers();
 
     // Configure the updater
     LOG_INFO() << "Configuring QSimpleUpdater...";

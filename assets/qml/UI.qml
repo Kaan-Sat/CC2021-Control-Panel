@@ -74,6 +74,18 @@ Page {
         }
 
         Label {
+            font.bold: true
+            font.pixelSize: 18
+            font.family: app.monoFont
+            Layout.alignment: Qt.AlignVCenter
+            text: Cpp_SerialStudio_Communicator.currentTime
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Label {
             Layout.alignment: Qt.AlignVCenter
             text: qsTr("Serial Studio Connection")
         }
@@ -81,6 +93,11 @@ Page {
         Switch {
             Layout.alignment: Qt.AlignVCenter
             Universal.accent: Universal.Green
+            checked: Cpp_SerialStudio_Communicator.connectedToSerialStudio
+
+            MouseArea {
+                anchors.fill: parent
+            }
         }
     }
 
@@ -90,8 +107,8 @@ Page {
     RowLayout {
         anchors.fill: parent
         spacing: app.spacing
-        anchors.margins: app.spacing
-        anchors.topMargin: 2 * app.spacing + toolbar.height
+        anchors.margins: 2 * app.spacing
+        anchors.topMargin: 3 * app.spacing + toolbar.height
 
         //
         // Buttons
@@ -111,10 +128,11 @@ Page {
 
             Button {
                 id: simModeEnabled
-
-
-                checkable: true
                 text: qsTr("Simulation mode")
+
+                checked: Cpp_SerialStudio_Communicator.simulationEnabled
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
+                onClicked: Cpp_SerialStudio_Communicator.simulationEnabled = !Cpp_SerialStudio_Communicator.simulationEnabled
 
                 icon.width: 42
                 icon.height: 42
@@ -129,10 +147,11 @@ Page {
 
             Button {
                 id: activateSimMode
-
-                checkable: true
-                enabled: simModeEnabled.checked
                 text: qsTr("Activate simulation mode")
+
+                enabled: simModeEnabled.checked && simModeEnabled.enabled
+                checked: Cpp_SerialStudio_Communicator.simulationActivated
+                onClicked: Cpp_SerialStudio_Communicator.simulationActivated = !Cpp_SerialStudio_Communicator.simulationActivated
 
                 icon.width: 42
                 icon.height: 42
@@ -148,13 +167,17 @@ Page {
             Button {
                 id: telemetryEnabled
 
-                checkable: true
                 text: qsTr("Container telemetry")
+
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
+                checked: Cpp_SerialStudio_Communicator.containerTelemetryEnabled
+                onClicked: Cpp_SerialStudio_Communicator.containerTelemetryEnabled = !Cpp_SerialStudio_Communicator.containerTelemetryEnabled
 
                 icon.width: 42
                 icon.height: 42
                 font.pixelSize: 16
-                icon.source: "qrc:/icons/telemetry-on.svg"
+                icon.source: checked ? "qrc:/icons/telemetry-on.svg" :
+                                       "qrc:/icons/telemetry-off.svg"
 
                 Layout.minimumWidth: grid.columnWidth
                 Layout.maximumWidth: grid.columnWidth
@@ -163,15 +186,38 @@ Page {
             }
 
             Button {
-                id: payloadTelemetry
+                id: updateTime
+                text: qsTr("Update container time")
 
-                checkable: true
-                text: qsTr("Payload telemetry")
+                onClicked: Cpp_SerialStudio_Communicator.updateContainerTime()
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
 
                 icon.width: 42
                 icon.height: 42
                 font.pixelSize: 16
-                icon.source: "qrc:/icons/radar.svg"
+                icon.source: "qrc:/icons/time.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
+                id: payload1Telemetry
+
+                checkable: true
+                text: qsTr("SP1X telemetry")
+
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
+                checked: Cpp_SerialStudio_Communicator.payload1TelemetryEnabled
+                onClicked: Cpp_SerialStudio_Communicator.payload1TelemetryEnabled = !Cpp_SerialStudio_Communicator.payload1TelemetryEnabled
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: checked ? "qrc:/icons/telemetry-on.svg" :
+                                       "qrc:/icons/telemetry-off.svg"
 
                 Layout.minimumWidth: grid.columnWidth
                 Layout.maximumWidth: grid.columnWidth
@@ -181,7 +227,10 @@ Page {
 
             Button {
                 id: releasePayload1
-                text: qsTr("Release payload 1")
+                text: qsTr("Release SPX1")
+
+                onClicked: Cpp_SerialStudio_Communicator.releasePayload1()
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
 
                 icon.width: 42
                 icon.height: 42
@@ -195,8 +244,33 @@ Page {
             }
 
             Button {
+                id: payload2Telemetry
+
+                checkable: true
+                text: qsTr("SP2X telemetry")
+
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
+                checked: Cpp_SerialStudio_Communicator.payload2TelemetryEnabled
+                onClicked: Cpp_SerialStudio_Communicator.payload2TelemetryEnabled = !Cpp_SerialStudio_Communicator.payload2TelemetryEnabled
+
+                icon.width: 42
+                icon.height: 42
+                font.pixelSize: 16
+                icon.source: checked ? "qrc:/icons/telemetry-on.svg" :
+                                       "qrc:/icons/telemetry-off.svg"
+
+                Layout.minimumWidth: grid.columnWidth
+                Layout.maximumWidth: grid.columnWidth
+                Layout.minimumHeight: grid.columnHeight
+                Layout.maximumHeight: grid.columnHeight
+            }
+
+            Button {
                 id: releasePayload2
-                text: qsTr("Release payload 2")
+                text: qsTr("Release SPX2")
+
+                onClicked: Cpp_SerialStudio_Communicator.releasePayload2()
+                enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
 
                 icon.width: 42
                 icon.height: 42
@@ -207,25 +281,6 @@ Page {
                 Layout.maximumWidth: grid.columnWidth
                 Layout.minimumHeight: grid.columnHeight
                 Layout.maximumHeight: grid.columnHeight
-            }
-
-            Button {
-                id: updateTime
-                text: qsTr("Update container time")
-
-                icon.width: 42
-                icon.height: 42
-                font.pixelSize: 16
-                icon.source: "qrc:/icons/time.svg"
-
-                Layout.minimumWidth: grid.columnWidth
-                Layout.maximumWidth: grid.columnWidth
-                Layout.minimumHeight: grid.columnHeight
-                Layout.maximumHeight: grid.columnHeight
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             Item {
@@ -247,12 +302,14 @@ Page {
                 Layout.maximumWidth: grid.columnWidth
                 Layout.minimumHeight: grid.columnHeight / 2
                 Layout.maximumHeight: grid.columnHeight / 2
+
+                onClicked: Cpp_SerialStudio_Communicator.openCsv()
             }
 
             Label {
                 verticalAlignment: Label.AlignVCenter
                 horizontalAlignment: Label.AlignHCenter
-                text: "<" + qsTr("No CSV file selected") + ">"
+                text: "<" + Cpp_SerialStudio_Communicator.csvFileName + ">"
 
                 Layout.minimumWidth: grid.columnWidth
                 Layout.maximumWidth: grid.columnWidth
@@ -264,26 +321,70 @@ Page {
         //
         // Console display
         //
-        TextArea {
-            opacity: 0.8
-            readOnly: true
-            color: "#72d5a3"
-            font.pixelSize: 12
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            font.family: app.monoFont
-            textFormat: Text.PlainText
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            placeholderText: qsTr("No data received so far") + "..."
 
-            background: Rectangle {
-                color: "#000000"
-                border.width: 2
-                border.color: "#bebebe"
+            RowLayout {
+                spacing: app.spacing
+                Layout.fillWidth: true
+
+                Label {
+                    text: qsTr("CSV Row") + ":"
+                    Layout.alignment: Qt.AlignVCenter
+                }
+
+                TextField {
+                    color: "#72d5a3"
+                    readOnly: true
+                    font.pixelSize: 12
+                    Layout.fillWidth: true
+                    font.family: app.monoFont
+                    Layout.alignment: Qt.AlignVCenter
+                    placeholderText: qsTr("No CSV data loaded")
+
+                    text: Cpp_SerialStudio_Communicator.currentSimulatedReading
+
+                    background: Rectangle {
+                        border.width: 1
+                        color: "#aa000000"
+                        border.color: "#bebebe"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                    }
+                }
             }
 
-            MouseArea {
-                anchors.fill: parent
+            TextArea {
+                id: textArea
+                readOnly: true
+                color: "#72d5a3"
+                font.pixelSize: 12
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                font.family: app.monoFont
+                textFormat: Text.PlainText
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                placeholderText: qsTr("No data received so far") + "..."
+
+                Connections {
+                    target: Cpp_SerialStudio_Communicator
+                    function onRx(data) {
+                        textArea.text += data
+                    }
+                }
+
+                background: Rectangle {
+                    border.width: 1
+                    color: "#aa000000"
+                    border.color: "#bebebe"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                }
             }
         }
     }
