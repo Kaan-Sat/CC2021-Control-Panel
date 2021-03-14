@@ -36,9 +36,19 @@
 
 using namespace SerialStudio;
 
+/*
+ * Set TCP port to communicate with Serial Studio
+ */
 #define SERIAL_STUDIO_PLUGINS_PORT 7777
+
+/*
+ * Pointer to singleton instance of class
+ */
 static Communicator *INSTANCE = nullptr;
 
+/**
+ * Constructor function
+ */
 Communicator::Communicator()
 {
     // Set default values
@@ -53,8 +63,9 @@ Communicator::Communicator()
 
     // Connect socket signals/slots
     connect(&m_socket, &QTcpSocket::disconnected, &m_socket, &QTcpSocket::close);
-    connect(&m_socket, &QTcpSocket::connected, this, &Communicator::connectedChanged);
-    connect(&m_socket, &QTcpSocket::disconnected, this, &Communicator::connectedChanged);
+    connect(&m_socket, &QTcpSocket::connected, this, &Communicator::onConnectedChanged);
+    connect(&m_socket, &QTcpSocket::disconnected, this,
+            &Communicator::onConnectedChanged);
 
     // Timer module signals/slots
     auto te = Misc::TimerEvents::getInstance();
@@ -63,6 +74,9 @@ Communicator::Communicator()
     connect(te, &Misc::TimerEvents::timeout42Hz, this, &Communicator::updateCurrentTime);
 }
 
+/**
+ * Returns a pointer to the only instance of the application
+ */
 Communicator *Communicator::getInstance()
 {
     if (!INSTANCE)
@@ -71,41 +85,65 @@ Communicator *Communicator::getInstance()
     return INSTANCE;
 }
 
+/**
+ * Returns @c true if the application is connected to the Serial Studio TCP server
+ */
 bool Communicator::connectedToSerialStudio() const
 {
     return m_socket.state() == QTcpSocket::ConnectedState;
 }
 
+/**
+ * Returns @c true if the simulation mode is enabled
+ */
 bool Communicator::simulationEnabled() const
 {
     return m_simulationEnabled;
 }
 
+/**
+ * Returns @c true if simulation mode is enabled & active
+ */
 bool Communicator::simulationActivated() const
 {
     return simulationEnabled() && m_simulationActivated;
 }
 
+/**
+ * Returns @c true if SP1 telemetry is enabled
+ */
 bool Communicator::payload1TelemetryEnabled() const
 {
     return m_payload1TelemetryEnabled;
 }
 
+/**
+ * Returns @c true if SP2 telemetry is enabled
+ */
 bool Communicator::payload2TelemetryEnabled() const
 {
     return m_payload2TelemetryEnabled;
 }
 
+/**
+ * Returns @c true if container telemetry is enabled
+ */
 bool Communicator::containerTelemetryEnabled() const
 {
     return m_containerTelemetryEnabled;
 }
 
+/**
+ * Returns current time in hh:mm:ss:zzz format
+ */
 QString Communicator::currentTime() const
 {
     return m_currentTime;
 }
 
+/**
+ * Returns the name of the currently loaded CSV file
+ */
 QString Communicator::csvFileName() const
 {
     if (m_csvFile.isOpen())
@@ -117,11 +155,18 @@ QString Communicator::csvFileName() const
     return tr("No CSV file selected");
 }
 
+/**
+ * Returns the value of the current row of the simulated pressure CSV file
+ */
 QString Communicator::currentSimulatedReading() const
 {
     return m_currentSimulationData;
 }
 
+/**
+ * Opens a dialog that allows the user to select a CSV file to load to the application.
+ * The CSV file must contain only one column with simulated pressure data.
+ */
 void Communicator::openCsv()
 {
     // clang-format off
@@ -162,6 +207,9 @@ void Communicator::openCsv()
     emit csvFileNameChanged();
 }
 
+/**
+ * Tries to establish a connection with Serial Studio's TCP server
+ */
 void Communicator::tryConnection()
 {
     if (!connectedToSerialStudio())
@@ -171,29 +219,39 @@ void Communicator::tryConnection()
     }
 }
 
+/**
+ * Sends the command to release the first scientific payload
+ */
 void Communicator::releasePayload1()
 {
     if (connectedToSerialStudio())
         sendData("CMD,1714,SP,R1;");
 }
 
+/**
+ * Sends the command to release the second scientific payload
+ */
 void Communicator::releasePayload2()
 {
     if (connectedToSerialStudio())
         sendData("CMD,1714,SP,R2;");
 }
 
+/**
+ * Sends the current time to the payload with the hh:mm:ss format
+ */
 void Communicator::updateContainerTime()
 {
     if (connectedToSerialStudio())
     {
-        m_currentTime = QDateTime::currentDateTime().toString("hh:mm:ss");
-        emit currentTimeChanged();
-
-        sendData("CMD,1714,ST," + m_currentTime + ";");
+        auto time = QDateTime::currentDateTime().toString("hh:mm:ss");
+        sendData("CMD,1714,ST," + time + ";");
     }
 }
 
+/**
+ * Enables/disables simulation mode
+ */
 void Communicator::setSimulationMode(const bool enabled)
 {
     if (connectedToSerialStudio())
@@ -211,6 +269,9 @@ void Communicator::setSimulationMode(const bool enabled)
     }
 }
 
+/**
+ * Activates/deactivates sending simulated pressure readings to the CanSat
+ */
 void Communicator::setSimulationActivated(const bool activated)
 {
     if (connectedToSerialStudio() && simulationEnabled())
@@ -227,6 +288,9 @@ void Communicator::setSimulationActivated(const bool activated)
     }
 }
 
+/**
+ * Enables/disables SP1 telemetry
+ */
 void Communicator::setPayload1TelemetryEnabled(const bool enabled)
 {
     if (connectedToSerialStudio())
@@ -242,6 +306,9 @@ void Communicator::setPayload1TelemetryEnabled(const bool enabled)
     }
 }
 
+/**
+ * Enables/disables SP2 telemetry
+ */
 void Communicator::setPayload2TelemetryEnabled(const bool enabled)
 {
     if (connectedToSerialStudio())
@@ -257,6 +324,9 @@ void Communicator::setPayload2TelemetryEnabled(const bool enabled)
     }
 }
 
+/**
+ * Enables/disables container telemetry
+ */
 void Communicator::setContainerTelemetryEnabled(const bool enabled)
 {
     if (connectedToSerialStudio())
@@ -272,12 +342,22 @@ void Communicator::setContainerTelemetryEnabled(const bool enabled)
     }
 }
 
+/**
+ * Gets the current time in hh:mm:ss:zzz format. This value is used by the user interface,
+ * not by the CanSat container.
+ */
 void Communicator::updateCurrentTime()
 {
-    m_currentTime = QDateTime::currentDateTime().toString("hh:mm:ss");
+    m_currentTime = QDateTime::currentDateTime().toString("hh:mm:ss:zzz");
     emit currentTimeChanged();
 }
 
+/**
+ * Reads, validates & sends current simulated pressure reading to the CanSat.
+ *
+ * If we reach the last CSV row, then simulation mode shall be disabled & a message-box
+ * shall be shown to the user.
+ */
 void Communicator::sendSimulatedData()
 {
     // Stop if simulation mode is not active
@@ -320,21 +400,40 @@ void Communicator::sendSimulatedData()
     // Show CSV finished box & disable simulation mode
     else
     {
+        setSimulationActivated(false);
         Misc::Utilities::showMessageBox(tr("Pressure simulation finished"),
                                         tr("Reached end of CSV file"));
-        setSimulationActivated(false);
     }
 }
 
+/**
+ * Waits 500 ms and notifies the UI if the TCP connection with Serial Studio has been
+ * established.
+ *
+ * We need to wait in order to avoid 'flickering' in the UI when the plugin system of
+ * Serial Studio is disabled.
+ */
+void Communicator::onConnectedChanged()
+{
+    QTimer::singleShot(500, this, &Communicator::connectedChanged);
+}
+
+/**
+ * Displays any socket errors with a message-box
+ */
 void Communicator::onErrorOccurred(const QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
     Misc::Utilities::showMessageBox(tr("TCP socket error"), m_socket.errorString());
 }
 
+/**
+ * Sends the given @a data string to Serial Studio, which in turn sends the data through
+ * the serial port.
+ */
 bool Communicator::sendData(const QString &data)
 {
-    if (m_socket.isWritable() && m_socket.isOpen() && !data.isEmpty())
+    if (connectedToSerialStudio() && !data.isEmpty())
     {
         auto bytes = data.toUtf8();
         auto wleng = m_socket.write(bytes);

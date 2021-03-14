@@ -56,6 +56,7 @@ include(libs/Libraries.pri)
 
 win32* {
     RC_FILE = deploy/windows/resources/info.rc
+    OTHER_FILES += deploy/windows/nsis/setup.nsi
 }
 
 macx* {

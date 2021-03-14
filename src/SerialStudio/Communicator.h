@@ -109,6 +109,7 @@ public slots:
 private slots:
     void updateCurrentTime();
     void sendSimulatedData();
+    void onConnectedChanged();
     void onErrorOccurred(const QAbstractSocket::SocketError socketError);
 
 private:

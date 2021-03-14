@@ -26,16 +26,43 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Controls.Universal 2.12
 
+import QtGraphicalEffects 1.0
+
 Page {
     id: root
 
     //
     // Background
     //
-    background: Image {
-        opacity: 0.72
-        fillMode: Image.PreserveAspectCrop
-        source: "qrc:/images/background.jpg"
+    background: Item {
+        Image {
+            id: img
+            opacity: 0.72
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            source: "qrc:/images/background.jpg"
+        }
+
+        FastBlur {
+            radius: 32
+            source: img
+            anchors.fill: img
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop {
+                    position: 1
+                    color: "#80240042"
+                }
+
+                GradientStop {
+                    position: 0
+                    color: "#80000000"
+                }
+            }
+        }
     }
 
     //
@@ -75,7 +102,7 @@ Page {
 
         Label {
             font.bold: true
-            font.pixelSize: 18
+            font.pixelSize: 22
             font.family: app.monoFont
             Layout.alignment: Qt.AlignVCenter
             text: Cpp_SerialStudio_Communicator.currentTime
@@ -207,7 +234,7 @@ Page {
                 id: payload1Telemetry
 
                 checkable: true
-                text: qsTr("SP1X telemetry")
+                text: qsTr("SP1 telemetry")
 
                 enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
                 checked: Cpp_SerialStudio_Communicator.payload1TelemetryEnabled
@@ -227,7 +254,7 @@ Page {
 
             Button {
                 id: releasePayload1
-                text: qsTr("Release SPX1")
+                text: qsTr("Release SP1")
 
                 onClicked: Cpp_SerialStudio_Communicator.releasePayload1()
                 enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
@@ -247,7 +274,7 @@ Page {
                 id: payload2Telemetry
 
                 checkable: true
-                text: qsTr("SP2X telemetry")
+                text: qsTr("SP2 telemetry")
 
                 enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
                 checked: Cpp_SerialStudio_Communicator.payload2TelemetryEnabled
@@ -267,7 +294,7 @@ Page {
 
             Button {
                 id: releasePayload2
-                text: qsTr("Release SPX2")
+                text: qsTr("Release SP2")
 
                 onClicked: Cpp_SerialStudio_Communicator.releasePayload2()
                 enabled: Cpp_SerialStudio_Communicator.connectedToSerialStudio
@@ -363,7 +390,7 @@ Page {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 contentWidth: parent.width
-                ScrollBar.horizontal.policy: ScrollBar.AsNeeded
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
                 TextArea {
                     id: textArea
