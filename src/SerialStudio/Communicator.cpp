@@ -370,22 +370,21 @@ void Communicator::sendSimulatedData()
         // Get CSV row data
         auto row = m_csvData.at(m_row);
 
-        // Validate column count
-        if (row.count() == 1)
+        // Generate row string
+        QString cmd = "";
+        for (int i = 0; i < row.count(); ++i)
         {
-            // Get column data
-            m_currentSimulationData = row.first();
-            emit currentSimulatedReadingChanged();
-
-            // Check if data is a number & send
-            bool ok = false;
-            auto num = m_currentSimulationData.toDouble(&ok);
-            if (ok)
-            {
-                auto numStr = QString::number(num);
-                sendData("CMD,1714,SIMP," + numStr + ";");
-            }
+            cmd.append(row.at(i));
+            cmd.append(",");
         }
+
+        // Remove last "," from command string & add ";"
+        cmd.chop(1);
+        cmd.append(";");
+
+        // Send command
+        if (!cmd.isEmpty())
+            sendData(cmd);
 
         // Column count invalid
         else
