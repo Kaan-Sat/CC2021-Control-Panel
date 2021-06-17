@@ -2,21 +2,21 @@
    "updates":{
       "windows":{
          "open-url":"https://github.com/Kaan-Sat/CC2021-Control-Panel/releases/latest",
-         "latest-version":"1.0.1",
+         "latest-version":"1.0.3",
          "download-url":"",
          "changelog":"",
          "mandatory":false
       },
       "osx":{
          "open-url":"https://github.com/Kaan-Sat/CC2021-Control-Panel/releases/latest",
-         "latest-version":"1.0.1",
+         "latest-version":"1.0.3",
          "download-url":"",
          "changelog":"",
          "mandatory":false
       },
       "linux":{
          "open-url":"https://github.com/Kaan-Sat/CC2021-Control-Panel/releases/latest",
-         "latest-version":"1.0.1",
+         "latest-version":"1.0.3",
          "download-url":"",
          "changelog":"",
          "mandatory":false
