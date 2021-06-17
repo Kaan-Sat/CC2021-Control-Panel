@@ -120,7 +120,8 @@ private:
     QTcpSocket m_socket;
 
     int m_row;
-    QFile m_csvFile;
+    QFile m_file;
+    QFile m_tempFile;
     QString m_currentTime;
     QList<QStringList> m_csvData;
     QString m_currentSimulationData;

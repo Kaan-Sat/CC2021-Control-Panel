@@ -29,7 +29,7 @@ Unicode True
 !define DESCRIPTION                  "CanSat Competition 2021 Control Panel"
 !define VERSIONMAJOR                 1
 !define VERSIONMINOR                 0
-!define VERSIONBUILD                 1
+!define VERSIONBUILD                 3
 !define MUI_ABORTWARNING
 !define INSTALL_DIR                  "$PROGRAMFILES64\${APPNAME}"
 !define MUI_FINISHPAGE_RUN

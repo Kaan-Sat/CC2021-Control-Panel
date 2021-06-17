@@ -12,7 +12,7 @@ on:
 #--------------------------------------------------------------------------------
 
 env:
-  VERSION: "1.0.2"
+  VERSION: "1.0.3"
   EXECUTABLE: "cc2021"
   APPLICATION: "CC2021 Control Panel"
   QMAKE_PROJECT: "CC2021.pro"

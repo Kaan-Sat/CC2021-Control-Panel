@@ -59,7 +59,7 @@ Communicator::Communicator()
     m_simulationActivated = false;
     m_payload1TelemetryEnabled = true;
     m_payload2TelemetryEnabled = true;
-    m_containerTelemetryEnabled = true;
+    m_containerTelemetryEnabled = false;
 
     // Connect socket signals/slots
     connect(&m_socket, &QTcpSocket::disconnected, &m_socket, &QTcpSocket::close);
@@ -146,9 +146,9 @@ QString Communicator::currentTime() const
  */
 QString Communicator::csvFileName() const
 {
-    if (m_csvFile.isOpen())
+    if (m_file.isOpen())
     {
-        auto fileInfo = QFileInfo(m_csvFile.fileName());
+        auto fileInfo = QFileInfo(m_file.fileName());
         return fileInfo.fileName();
     }
 
@@ -171,9 +171,8 @@ void Communicator::openCsv()
 {
     // clang-format off
     auto name = QFileDialog::getOpenFileName(Q_NULLPTR,
-                                             tr("Select CSV file"),
-                                             QDir::homePath(),
-                                             tr("CSV files") + " (*.csv)");
+                                             tr("Select simulation file"),
+                                             QDir::homePath());
     // clang-format on
 
     // User did not select a file, abort
@@ -181,27 +180,59 @@ void Communicator::openCsv()
         return;
 
     // Close current file
-    if (m_csvFile.isOpen())
-        m_csvFile.close();
+    if (m_file.isOpen())
+        m_file.close();
 
     // Open the selected file
-    m_csvFile.setFileName(name);
-    if (m_csvFile.open(QFile::ReadOnly))
+    m_file.setFileName(name);
+    if (m_file.open(QFile::ReadOnly))
     {
+        // Close temp. file
+        if (m_tempFile.isOpen())
+            m_tempFile.close();
+
         // Disable simulation mode
         if (simulationActivated())
             setSimulationActivated(false);
 
+        // Generate CSV data
+        QString csv;
+        QTextStream in(&m_file);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            line.replace(" ", "");
+            if (line.startsWith("#") || line.isEmpty())
+                continue;
+            else
+            {
+                line.replace("$", "1714");
+                csv.append(line);
+                csv.append("\n");
+            }
+        }
+
+        // Save CSV file to temp path
+        m_tempFile.setFileName(QDir::tempPath() + "/cc2021_temp.csv");
+        if (m_tempFile.open(QFile::WriteOnly))
+        {
+            m_tempFile.write(csv.toUtf8());
+            m_tempFile.close();
+        }
+
         // Read CSV data
-        m_row = 0;
-        m_currentSimulationData = "";
-        m_csvData = QtCSV::Reader::readToList(m_csvFile);
-        emit currentSimulatedReadingChanged();
+        if (m_tempFile.open(QFile::ReadOnly))
+        {
+            m_row = 0;
+            m_currentSimulationData = "";
+            m_csvData = QtCSV::Reader::readToList(m_tempFile);
+            emit currentSimulatedReadingChanged();
+        }
     }
 
     // Open failure, alert user through a messagebox
     else
-        Misc::Utilities::showMessageBox(tr("File open error"), m_csvFile.errorString());
+        Misc::Utilities::showMessageBox(tr("File open error"), m_file.errorString());
 
     // Update UI
     emit csvFileNameChanged();
