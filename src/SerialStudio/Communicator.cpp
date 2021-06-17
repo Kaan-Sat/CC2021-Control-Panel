@@ -465,12 +465,21 @@ bool Communicator::sendData(const QString &data)
 {
     if (connectedToSerialStudio() && !data.isEmpty())
     {
-        auto bytes = data.toUtf8();
+        // Add extra bytes to generate fixed-length string
+        QString copy = data;
+        while (copy.length() < 22)
+            copy.append("\n");
+
+        // Write data to TCP socket
+        auto bytes = copy.toUtf8();
         auto wleng = m_socket.write(bytes);
 
+        // Calculate length of data sent
         auto sentData = bytes;
         sentData.chop(bytes.length() - wleng);
+        sentData.replace("\n", "");
 
+        // Update UI
         emit rx("TX: " + QString::fromUtf8(sentData) + "\n");
         return sentData.length() == bytes.length();
     }
